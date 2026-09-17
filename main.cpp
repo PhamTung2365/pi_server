@@ -5,7 +5,8 @@
 
 const char* ssid = "Penrose";
 const char* wifi_password = "until2365";
-const char* mqtt_server = "test.mosquitto.org";
+// Raspberry Pi LAN address running Mosquitto. Update if the Pi's DHCP address changes.
+const char* mqtt_server = "10.195.134.44";
 const int mqtt_port = 1883;
 const char* mqtt_user = "esp32";
 const char* mqtt_password = "sg90esp32";
@@ -25,7 +26,7 @@ unsigned long auto_lock_at = 0;
 String last_request_id;
 
 void publish_state(const char* status) {
-  StaticJsonDocument<160> document;
+  JsonDocument document;
   document["status"] = status;
   document["online"] = true;
   char payload[192];
@@ -34,7 +35,7 @@ void publish_state(const char* status) {
 }
 
 void handle_command(const byte* payload, unsigned int length) {
-  StaticJsonDocument<384> document;
+  JsonDocument document;
   DeserializationError error = deserializeJson(document, payload, length);
   if (error) {
     Serial.printf("Invalid MQTT JSON: %s\n", error.c_str());

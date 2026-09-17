@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+import numpy as np
+
 # These must exist before importing web_stream_face, which bootstraps auth.
 _database = tempfile.TemporaryDirectory()
 os.environ.update(
@@ -41,7 +43,9 @@ class WebAuthTest(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_anonymous_requests_are_blocked(self):
-        for path in ("/", "/status", "/info", "/api/admin/users"):
+        self.assertEqual(self.client.get("/").status_code, 302)
+        self.assertEqual(self.client.get("/").headers["Location"], "/login")
+        for path in ("/status", "/info", "/api/admin/users"):
             self.assertEqual(self.client.get(path).status_code, 401)
         self.assertEqual(self.client.post("/api/door/command").status_code, 401)
 
@@ -50,6 +54,16 @@ class WebAuthTest(unittest.TestCase):
         self.login("admin", "strong-admin-password")
         self.assertIn("Cửa chính".encode(), self.client.get("/").data)
         self.assertIn("Quản lý tài khoản".encode(), self.client.get("/admin/users").data)
+
+    def test_status_serializes_numpy_face_values(self):
+        self.login("admin", "strong-admin-password")
+        with web.state.lock:
+            web.state.match = np.bool_(True)
+            web.state.confidence = np.float32(0.95)
+        response = self.client.get("/status")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json["match"])
+        self.assertAlmostEqual(response.json["confidence"], 0.95, places=6)
 
     def test_admin_creates_user_and_csrf_is_required(self):
         self.login("admin", "strong-admin-password")

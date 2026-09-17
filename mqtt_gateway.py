@@ -104,7 +104,10 @@ class DoorGateway:
             self.client.loop_stop()
 
     def _on_connect(self, client, _userdata, _flags, reason_code, _properties):
-        connected = int(reason_code) == 0
+        if hasattr(reason_code, "is_failure"):
+            connected = not reason_code.is_failure
+        else:
+            connected = int(reason_code) == 0
         with self._lock:
             self._connected = connected
         if connected:

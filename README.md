@@ -176,10 +176,10 @@ Trong VS Code, chọn đúng interpreter `.venv-camera/bin/python` bằng lệnh
 thường xuất hiện khi VS Code đang chọn nhầm Python, dù OpenCV đã cài ở môi
 trường khác.
 
-Sau đó thay `192.168.1.50` bằng địa chỉ IP của Raspberry Pi:
+Sau đó thay `192.168.1.102` bằng địa chỉ IP của Raspberry Pi:
 
 ```bash
-python laptop_camera_sender.py --host 192.168.1.50
+python laptop_camera_sender.py --host 192.168.1.102
 ```
 
 `--host` phải là IP hoặc hostname mà laptop phân giải được của Raspberry Pi.
@@ -189,10 +189,10 @@ ví dụ `192.168.1.50`.
 Tuỳ chọn camera khác hoặc giảm chất lượng:
 
 ```bash
-python3 laptop_camera_sender.py --host 192.168.1.50 --camera 1 --fps 10 --quality 70
+python3 laptop_camera_sender.py --host 192.168.1.102 --camera 1 --fps 10 --quality 70
 ```
 
-Mở web tại `http://192.168.1.50:5000`. Nếu Raspberry Pi có firewall, cho phép
+Mở web tại `http://192.168.1.102:5000`. Nếu Raspberry Pi có firewall, cho phép
 TCP port `5001` từ mạng LAN. Chỉ chạy một server backend trên Raspberry Pi để
 tránh lỗi cổng `5000` và `5001` đã được sử dụng.
 

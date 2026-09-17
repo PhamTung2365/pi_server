@@ -41,6 +41,16 @@ class DoorGatewayTest(unittest.TestCase):
         self.assertTrue(gateway.send("lock", "alice", "web"))
         self.assertNotIn("open_seconds", client.published[1])
 
+    @patch.dict(os.environ, {"MQTT_ENABLED": "true"})
+    def test_paho_v2_reason_code_is_supported(self):
+        client = FakeClient()
+        gateway = DoorGateway(client)
+        reason_code = SimpleNamespace(is_failure=False)
+
+        gateway._on_connect(client, None, None, reason_code, None)
+
+        self.assertTrue(gateway.snapshot()["connected"])
+
 
 if __name__ == "__main__":
     unittest.main()

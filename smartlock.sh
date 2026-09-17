@@ -46,6 +46,13 @@ case "${1:-help}" in
             echo "Chưa có virtualenv. Chạy: bash smartlock.sh setup"
             exit 1
         fi
+        if command -v ss >/dev/null 2>&1; then
+            if ss -ltn | awk '$4 ~ /:5000$/ || $4 ~ /:5001$/ {found=1} END {exit !found}'; then
+                echo "Server đã chạy hoặc cổng 5000/5001 đang được sử dụng." >&2
+                echo "Kiểm tra: ss -ltnp | grep -E ':5000|:5001'" >&2
+                exit 1
+            fi
+        fi
         cd "$PROJECT_DIR/.."
         exec "$PYTHON" -m pi_server.web_stream_face
         ;;

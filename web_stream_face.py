@@ -202,9 +202,9 @@ def process_frames():
             name, confidence = recognize_face(embedding)
 
             with state.lock:
-                state.match = (name is not None and confidence >= THRESHOLD)
+                state.match = bool(name is not None and confidence >= THRESHOLD)
                 state.name = name if name else 'Unknown'
-                state.confidence = confidence if confidence else 0.0
+                state.confidence = float(confidence) if confidence else 0.0
 
             # Draw result
             if name and confidence >= THRESHOLD:
@@ -280,10 +280,11 @@ def start_services():
 # ==================== ROUTES ====================
 
 @app.route('/')
-@login_required
 def index():
     """Home page"""
     user = current_user()
+    if user is None:
+        return redirect(url_for('login'))
     return render_template(
         'dashboard.html',
         is_admin=user['role'] == 'admin',
@@ -312,9 +313,9 @@ def get_status():
             'ready': state.is_ready,
             'faces': state.faces,
             'fps': state.fps,
-            'match': state.match,
+            'match': bool(state.match),
             'name': state.name,
-            'confidence': round(state.confidence, 3),
+            'confidence': float(round(state.confidence, 3)),
             'people_count': len(get_all_names()),
             'total_count': get_person_count(),
             'camera_source': camera_source,
